@@ -4,6 +4,7 @@ pipeline {
   stages {
       stage('Build Artifact') {
             steps {
+              sh "echo $PATH"
               sh "java -version"
               sh "mvn -v"
               sh "mvn clean package -DskipTests=true"
