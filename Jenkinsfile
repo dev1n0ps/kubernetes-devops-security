@@ -4,7 +4,7 @@ pipeline {
   stages {
       stage('Build Artifact') {
             steps {
-              sh "mvn clean package -DskipTests=true -DargLine='--add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED'"
+              sh "mvn clean package -DskipTests=true"
               archive 'target/*.jar' //so that they can be downloaded later
             }
         }   
