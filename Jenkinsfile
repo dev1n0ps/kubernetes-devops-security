@@ -31,7 +31,7 @@ pipeline {
       stage('SonarQube - SAST') {
             steps {
                withSonarQubeEnv('SonarQube') {
-                  sh "mvn sonar:sonar -Dsonar.projectKey=numeric-application -Dsonar.host.url=http://devsecops-demo.germanywestcentral.cloudapp.azure.com:9000 -Dsonar.login=sqp_75bd4ec401edf4725e63a0222c40844c935f9013"
+                  sh "mvn sonar:sonar -Dsonar.projectKey=numeric-application -Dsonar.host.url=http://devsecops-demo.germanywestcentral.cloudapp.azure.com:9000"
                }
                timeout(time: 2, unit: 'MINUTES') { // Just in case something goes wrong, pipeline will be killed after a timeout
                   script {
@@ -39,7 +39,29 @@ pipeline {
                   }
                }
             }
-        }      
+        }  
+
+      	stage('Vulnerability Scan - Docker') {
+          steps {
+           sh "mvn dependency-check:check" 
+/*            parallel(
+        	    "Dependency Scan": {
+        		    sh "mvn dependency-check:check"
+			        },
+ 			        "Trivy Scan":{
+				        sh "bash trivy-docker-image-scan.sh"
+			        },
+			        "OPA Conftest":{
+				        sh 'docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-docker-security.rego Dockerfile'
+			        }    	
+      	    )*/
+          }
+          post {
+            always {
+                dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
+            }
+          }
+        }    
 
       stage('Docker Build and Push') {
          steps {
