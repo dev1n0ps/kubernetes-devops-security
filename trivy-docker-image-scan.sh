@@ -3,11 +3,12 @@
 dockerImageName=$(awk 'NR==1 {print $2}' Dockerfile)
 echo $dockerImageName
 
-sudo chown -R jenkins:jenkins $WORKSPACE
-sudo chmod -R 755 $WORKSPACE
+mkdir -p $WORKSPACE/.trivy-cache
+sudo chown -R jenkins:jenkins $WORKSPACE/.trivy-cache
 
-docker run --rm -u $(id -u jenkins):$(id -g jenkins)  -v $WORKSPACE/.cache:/root/.cache aquasec/trivy:0.17.2 -q image --exit-code 0 --severity HIGH --light $dockerImageName
-docker run --rm -u $(id -u jenkins):$(id -g jenkins)  -v $WORKSPACE/.cache:/root/.cache aquasec/trivy:0.17.2 -q image --exit-code 1 --severity CRITICAL --light $dockerImageName
+
+docker run --rm -u $(id -u jenkins):$(id -g jenkins)  -v $WORKSPACE/.trivy-cache:/custom/cache aquasec/trivy:0.17.2 --cache-dir /custom/cache -q image --exit-code 0 --severity HIGH --light $dockerImageName
+docker run --rm -u $(id -u jenkins):$(id -g jenkins)  -v $WORKSPACE/.trivy-cache:/custom/cache aquasec/trivy:0.17.2 --cache-dir /custom/cache -q image --exit-code 1 --severity CRITICAL --light $dockerImageName
 
     # Trivy scan result processing
     exit_code=$?
