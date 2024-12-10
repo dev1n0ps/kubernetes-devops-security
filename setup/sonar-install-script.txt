@@ -1,7 +1,79 @@
 docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest
 
+docker run -d --name sonarqube \
+  -v sonarqube_data:/opt/sonarqube/data \
+  -v sonarqube_logs:/opt/sonarqube/logs \
+  -v sonarqube_extensions:/opt/sonarqube/extensions \
+  -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true \
+  -p 9000:9000 sonarqube:latest
+
+
 mvn sonar:sonar \
 -Dsonar.projectKey=numeric-application \
 -Dsonar.host.url=http://devsecops-demo.germanywestcentral.cloudapp.azure.com:9000/
 -Dsonar.login=sqp_75bd4ec401edf4725e63a0222c40844c935f9013
 
+- Adding persistent storage : 
+
+Unfortunately, you cannot directly modify a running container to add persistent storage. However, you can achieve persistence by **creating a new container** with the desired volume mappings while preserving the data from your existing container.
+
+### Steps to Set Up Persistent Storage for an Existing Container:
+
+1. **Stop the Existing Container:**
+   ```bash
+   docker stop sonarqube
+   ```
+
+2. **Backup Data from the Existing Container (Optional but Recommended):**
+   - Copy the data from the container to your host machine:
+     ```bash
+     docker cp sonarqube:/opt/sonarqube/data /path/to/backup/sonarqube_data
+     docker cp sonarqube:/opt/sonarqube/logs /path/to/backup/sonarqube_logs
+     docker cp sonarqube:/opt/sonarqube/extensions /path/to/backup/sonarqube_extensions
+     ```
+
+3. **Create Persistent Volumes:**
+   - Create Docker-managed volumes for the required paths:
+     ```bash
+     docker volume create sonarqube_data
+     docker volume create sonarqube_logs
+     docker volume create sonarqube_extensions
+     ```
+
+4. **Start a New Container with Volume Mappings:**
+   - Use the existing image and map the volumes:
+     ```bash
+     docker run -d --name sonarqube_new \
+       -v sonarqube_data:/opt/sonarqube/data \
+       -v sonarqube_logs:/opt/sonarqube/logs \
+       -v sonarqube_extensions:/opt/sonarqube/extensions \
+       -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true \
+       -p 9000:9000 sonarqube:latest
+     ```
+
+5. **Restore Data to Volumes (If Backed Up):**
+   - Copy the backed-up data into the newly created volumes:
+     ```bash
+     docker cp /path/to/backup/sonarqube_data sonarqube_new:/opt/sonarqube/data
+     docker cp /path/to/backup/sonarqube_logs sonarqube_new:/opt/sonarqube/logs
+     docker cp /path/to/backup/sonarqube_extensions sonarqube_new:/opt/sonarqube/extensions
+     ```
+
+6. **Verify the Setup:**
+   - Check that the new container is running:
+     ```bash
+     docker ps
+     ```
+   - Verify that the data is accessible and persistent by stopping and restarting the container:
+     ```bash
+     docker stop sonarqube
+     docker start sonarqube
+     ```
+
+---
+
+### Why Can't You Modify a Running Container?
+Docker containers are immutable in their configuration. Changes like volume mounts, port bindings, or environment variables require creating a new container.
+
+### Key Takeaway:
+Set up persistent volumes by creating a new container with the required volume mappings, and optionally migrate existing data. This approach ensures future changes won't result in data loss.
