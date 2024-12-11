@@ -13,6 +13,9 @@ pipeline {
                     sh 'mvn build-helper:parse-version versions:set \
                         -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.minorVersion}.\\\${parsedVersion.nextIncrementalVersion} \
                             versions:commit'
+                    def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
+                    def version = matcher[0][1]
+                    env.IMAGE_NAME = "$version-$BUILD_NUMBER"
                 }
             }
       }
@@ -78,8 +81,8 @@ pipeline {
          steps {
            withDockerRegistry([credentialsId: "docker-hub", url: ""]) {
              sh 'printenv'
-             sh 'sudo docker build -t dev1n0ps/numeric-app:""$GIT_COMMIT"" .'
-             sh 'docker push dev1n0ps/numeric-app:""$GIT_COMMIT""'
+             sh 'sudo docker build -t dev1n0ps/numeric-app:${IMAGE_NAME} .'
+             sh 'docker push dev1n0ps/numeric-app:${IMAGE_NAME}'
            }
          }
        } 
