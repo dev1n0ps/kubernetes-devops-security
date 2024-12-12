@@ -1,8 +1,8 @@
 FROM amazoncorretto:17.0.7-alpine
-
 EXPOSE 8080
-RUN mkdir -p /usr/app
-COPY ./target/numeric-*.jar /usr/app
-WORKDIR /usr/app
-
-CMD java -jar numeric-*.jar
+ARG JAR_FILE=target/*.jar
+# -S	Ensures minimal, system-level user or group creation.
+RUN addgroup -S pipeline && adduser -S k8s-pipeline -G pipeline
+COPY ${JAR_FILE} /home/k8s-pipeline/app.jar
+USER k8s-pipeline
+ENTRYPOINT ["java", "-jar", "/home/k8s-pipeline/app.jar"]
