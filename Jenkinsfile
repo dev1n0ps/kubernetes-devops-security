@@ -5,7 +5,7 @@ pipeline {
         deploymentName = "devsecops"
         containerName = "devsecops-container"
         serviceName = "devsecops-svc"
-        imageName = "dev1n0ps/numeric-app:${VERSION}"
+        imageName = "dev1n0ps/numeric-app:${env.VERSION}"
         applicationURL="http://devsecops-demo.germanywestcentral.cloudapp.azure.com"
         applicationURI="/increment/99"
     }
@@ -25,6 +25,7 @@ pipeline {
                     def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
                     def version = matcher[0][1]
                     env.VERSION = "$version-$BUILD_NUMBER"
+                    echo "App Version: ${env.VERSION}"
                 }
             }
         }
@@ -115,10 +116,16 @@ pipeline {
 
 
         stage('K8S Deployment - DEV') {
+            environment {
+                // Dynamically set imageName for the deployment script
+                imageName = "dev1n0ps/numeric-app:${env.VERSION}"
+            }
             steps {
                 parallel(
                         "Deployment": {
                             withKubeConfig([credentialsId: 'kubeconfig']) {
+                                echo "Deploying using image: ${imageName}"
+                                export IMAGE_NAME=${imageName}
                                 sh "bash k8s-deployment.sh"
                             }
                         },
