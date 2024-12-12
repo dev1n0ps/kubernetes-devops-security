@@ -124,9 +124,11 @@ pipeline {
                 parallel(
                         "Deployment": {
                             withKubeConfig([credentialsId: 'kubeconfig']) {
-                                echo "Deploying using image: ${imageName}"
-                                export IMAGE_NAME=${imageName}
-                                sh "bash k8s-deployment.sh"
+                                sh '''
+                                    echo "Deploying using image: ${imageName}"
+                                    export IMAGE_NAME=${imageName}
+                                    bash k8s-deployment.sh
+                                '''
                             }
                         },
                         "Rollout Status": {
