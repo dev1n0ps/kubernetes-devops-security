@@ -44,12 +44,6 @@ pipeline {
             steps {
                 sh "mvn test"
             }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                    jacoco execPattern: 'target/jacoco.exec'
-                }
-            }
         }
 
         stage('SonarQube - SAST') {
@@ -80,11 +74,6 @@ pipeline {
                             sh 'docker run --rm -v $(pwd):/project openpolicyagent/conftest test --policy opa-docker-security.rego Dockerfile'
                         }
                 )
-            }
-            post {
-                always {
-                    dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
-                }
             }
         }
 
@@ -226,6 +215,37 @@ pipeline {
         //          }
         //        }
         //      }
+    }
+
+    post {
+            always {
+              junit 'target/surefire-reports/*.xml'
+              jacoco execPattern: 'target/jacoco.exec'
+              dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
+                publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'owasp-zap-report', reportFiles: 'zap_report.html', reportName: 'OWASP ZAP HTML Report', reportTitles: 'OWASP ZAP HTML Report', useWrapperFileDirectly: true])
+
+              //Use sendNotifications.groovy from shared library and provide current build result as parameter
+              //sendNotification currentBuild.result
+            }
+
+        success {
+            script {
+                /* Use slackNotifier.groovy from shared library and provide current build result as parameter */
+                env.failedStage = "none"
+                env.emoji = ":white_check_mark: :tada: :thumbsup_all:"
+                sendNotification currentBuild.result
+            }
+        }
+
+        failure {
+            script {
+                //Fetch information about  failed stage
+                def failedStages = getFailedStages( currentBuild )
+                env.failedStage = failedStages.failedStageName
+                env.emoji = ":x: :red_circle: :sos:"
+                sendNotification currentBuild.result
+            }
+        }
     }
 }
 
