@@ -1,6 +1,14 @@
 pipeline {
     agent any
 
+    environment {
+        deploymentName = "devsecops"
+        containerName = "devsecops-container"
+        serviceName = "devsecops-svc"
+        applicationURL="http://devsecops-demo.germanywestcentral.cloudapp.azure.com"
+        applicationURI="/increment/99"
+    }
+
     tools {
         maven 'Maven 3.9.9'
     }
@@ -110,8 +118,7 @@ pipeline {
                 parallel(
                         "Deployment": {
                             withKubeConfig([credentialsId: 'kubeconfig']) {
-                                sh "sed -i 's#replace#dev1n0ps/numeric-app:${IMAGE_NAME}#g' k8s_deployment_service.yaml"
-                                sh "kubectl apply -f k8s_deployment_service.yaml"
+                                sh "bash k8s-deployment.sh"
                             }
                         },
                         "Rollout Status": {
