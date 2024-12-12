@@ -83,8 +83,9 @@ forbidden_users = [
 ]
 
 deny[msg] {
-    command := "user"
-    users := [name | input[i].Cmd == "user"; name := input[i].Value]
+    some i  # Safely bind `i` to the index of the matched input
+    input[i].Cmd == "user"
+    users := [name | input[j].Cmd == "user"; name := input[j].Value]
     lastuser := users[count(users) - 1]
     forbidden_users_match := [forbidden | forbidden := forbidden_users[_]; lower(lastuser) == forbidden]
     count(forbidden_users_match) > 0
