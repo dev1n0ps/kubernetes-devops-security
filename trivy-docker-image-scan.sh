@@ -16,8 +16,11 @@ docker run --rm -u $(id -u jenkins):$(id -g jenkins)  -v $WORKSPACE/.trivy-cache
 
     # Check scan results
     if [[ "${exit_code}" == 1 ]]; then
-        echo "Image scanning failed. Vulnerabilities found"
+        echo "Image scanning failed. Vulnerabilities found."
         exit 1;
     else
-        echo "Image scanning passed. No CRITICAL vulnerabilities found"
+        echo "Image scanning passed. No CRITICAL vulnerabilities found."
     fi;
+
+# To test in on server directly
+# docker run --rm -v $WORKSPACE:/root/.cache/ aquasec/trivy:0.17.2 -q --light --exit-code 1 --severity CRITICAL image openjdk:17-jdk-slim
