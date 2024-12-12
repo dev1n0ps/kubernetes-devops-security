@@ -85,7 +85,7 @@ forbidden_users = [
 deny[msg] {
     command := "user"
     users := [name | input[i].Cmd == "user"; name := input[i].Value]
-    lastuser := users[count(users, -1)]
+    lastuser := users[count(users) - 1]
     forbidden_users_match := [forbidden | forbidden := forbidden_users[_]; lower(lastuser) == forbidden]
     count(forbidden_users_match) > 0
     msg = sprintf("Line %d: Last USER directive (USER %s) is forbidden", [i, lastuser])
