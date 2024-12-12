@@ -5,6 +5,7 @@ pipeline {
         deploymentName = "devsecops"
         containerName = "devsecops-container"
         serviceName = "devsecops-svc"
+        imageName = "dev1n0ps/numeric-app:${VERSION}"
         applicationURL="http://devsecops-demo.germanywestcentral.cloudapp.azure.com"
         applicationURI="/increment/99"
     }
@@ -23,7 +24,7 @@ pipeline {
                             versions:commit'
                     def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
                     def version = matcher[0][1]
-                    env.IMAGE_NAME = "$version-$BUILD_NUMBER"
+                    env.VERSION = "$version-$BUILD_NUMBER"
                 }
             }
         }
@@ -90,8 +91,8 @@ pipeline {
             steps {
                 withDockerRegistry([credentialsId: "docker-hub", url: ""]) {
                     sh 'printenv'
-                    sh 'sudo docker build -t dev1n0ps/numeric-app:${IMAGE_NAME} .'
-                    sh 'docker push dev1n0ps/numeric-app:${IMAGE_NAME}'
+                    sh 'sudo docker build -t dev1n0ps/numeric-app:${VERSION} .'
+                    sh 'docker push dev1n0ps/numeric-app:${VERSION}'
                 }
             }
         }
