@@ -1,5 +1,9 @@
 def call(String buildStatus = 'STARTED') {
+
     buildStatus = buildStatus ?: 'SUCCESS'
+
+    // Print the buildStatus
+    println "Build Status: ${buildStatus}"
 
     def color
 
@@ -44,7 +48,8 @@ def call(String buildStatus = 'STARTED') {
                                     ],
                                     "accessory": [
                                             "type": "image",
-                                            "image_url": "https://raw.githubusercontent.com/sidd-harth/devsecops-k8s-demo/main/slack-emojis/jenkins.png",
+                                            "image_url": "https://github.com/dev1n0ps/kubernetes-devops-security/blob/main/slack-emojis/jenkins.png",
+
                                             "alt_text": "Slack Icon"
                                     ]
                             ],
@@ -83,7 +88,7 @@ def call(String buildStatus = 'STARTED') {
                                     ],
                                     "accessory": [
                                             "type": "image",
-                                            "image_url": "https://raw.githubusercontent.com/sidd-harth/devsecops-k8s-demo/main/slack-emojis/k8s.png",
+                                            "image_url": "https://github.com/dev1n0ps/kubernetes-devops-security/blob/main/slack-emojis/k8s.png",
                                             "alt_text": "Kubernetes Icon"
                                     ],
                             ],
@@ -123,7 +128,7 @@ def call(String buildStatus = 'STARTED') {
                                     ],
                                     "accessory": [
                                             "type": "image",
-                                            "image_url": "https://raw.githubusercontent.com/sidd-harth/devsecops-k8s-demo/main/slack-emojis/github.png",
+                                            "image_url": "https://github.com/dev1n0ps/kubernetes-devops-security/blob/main/slack-emojis/github.png",
                                             "alt_text": "Github Icon"
                                     ]
                             ],
