@@ -224,6 +224,10 @@ pipeline {
         }
 
         stage('K8S Deployment - PROD') {
+            environment {
+                // Dynamically set imageName for the deployment script
+                imageName = "dev1n0ps/numeric-app:${env.VERSION}"
+            }
             steps {
                 parallel(
                         "Deployment": {
