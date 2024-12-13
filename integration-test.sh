@@ -19,16 +19,17 @@ then
     response=$(curl --connect-timeout 10 -s "$FULL_URL")
     http_code=$(curl -s -o /dev/null -w "%{http_code}" "$FULL_URL")
 
-    echo "response code : $response"
-    echo "http_code : $http_code"
-
-    if [[ "$response" == 100 ]];
-        then
-            echo "Increment Test Passed"
-        else
-            echo "Increment Test Failed"
-            exit 1;
+    # Check and print the response
+    if [[ -z "$response" ]]; then
+        echo "Error: Response is empty"
+        exit 1
+    elif [[ "$response" == 100 ]]; then
+        echo "Increment Test Passed"
+    else
+        echo "Increment Test Failed"
+        exit 1
     fi;
+
 
     if [[ "$http_code" == 200 ]];
         then
