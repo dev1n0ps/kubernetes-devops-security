@@ -8,7 +8,7 @@ echo $(id -u):$(id -g)
 
 # Use the GHCR image instead of the old DockerHub image
 docker pull ghcr.io/zaproxy/zaproxy:weekly || { echo "Failed to pull ZAP image"; exit 1; }
-docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-weekly zap-api-scan.py -t $applicationURL:$PORT/v3/api-docs -f openapi -r zap_report.html
+docker run -v $(pwd):/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:weekly zap-api-scan.py -t $applicationURL:$PORT/v3/api-docs -f openapi -r zap_report.html
 
 # comment above cmd and uncomment below lines to run with CUSTOM RULES
 #docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-weekly zap-api-scan.py -t $applicationURL:$PORT/v3/api-docs -f openapi -c zap_rules -r zap_report.html
