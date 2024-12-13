@@ -16,7 +16,8 @@ public class WebSecurityConfig {
         // Spring Security requires some form of authorization for all endpoints.
         http.csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity in this context
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // Allow all requests without authentication
+                        .requestMatchers("/increment/**").permitAll() // Allow public access to specific endpoints
+                        .anyRequest().permitAll() // Require authentication for other endpoints
                 );
         return http.build();
     }
