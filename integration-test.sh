@@ -8,14 +8,16 @@ PORT=$(kubectl -n default get svc ${serviceName} -o json | jq .spec.ports[].node
 
 echo $PORT
 echo $applicationURL:$PORT$applicationURI
+# Construct the FULL_URL as a string
+FULL_URL="${applicationURL}:${PORT}${applicationURI}"
+echo "Constructed URL: $FULL_URL"
 
 if [[ ! -z "$PORT" ]];
 then
 
-    FULL_URL= curl --connect-timeout 10 -s $applicationURL:$PORT$applicationURI
-    echo "Constructed URL: $FULL_URL"
-    response=$(FULL_URL)
-    http_code=$(curl -s -o /dev/null -w "%{http_code}" $applicationURL:$PORT$applicationURI)
+    # Perform the curl operation and capture the response and HTTP code
+    response=$(curl --connect-timeout 10 -s "$FULL_URL")
+    http_code=$(curl -s -o /dev/null -w "%{http_code}" "$FULL_URL")
 
     echo "response code : $response"
     echo "http_code : $http_code"
