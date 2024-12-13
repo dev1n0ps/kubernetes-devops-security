@@ -16,7 +16,7 @@ if [[ ! -z "$PORT" ]];
 then
 
     # Perform the curl operation and capture the response and HTTP code
-    response=$(curl --connect-timeout 10 -s "$FULL_URL")
+    response=$(curl -s "$FULL_URL")
     http_code=$(curl -s -o /dev/null -w "%{http_code}" "$FULL_URL")
 
     # Check and print the response
