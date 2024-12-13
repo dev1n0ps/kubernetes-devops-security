@@ -10,7 +10,14 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable());
+        //http.csrf(csrf -> csrf.disable());
+        // otherwise integration tests fail.The issue arises because Spring Security is enabled,
+        // and even though you haven't explicitly configured authentication, the default behavior of
+        // Spring Security requires some form of authorization for all endpoints.
+        http.csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity in this context
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll() // Allow all requests without authentication
+                );
         return http.build();
     }
 }
