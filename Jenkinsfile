@@ -1,3 +1,5 @@
+@Library('slack') _
+
 pipeline {
     agent any
 
@@ -224,15 +226,15 @@ pipeline {
               dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
                 publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'owasp-zap-report', reportFiles: 'zap_report.html', reportName: 'OWASP ZAP HTML Report', reportTitles: 'OWASP ZAP HTML Report'])
               //Use sendNotifications.groovy from shared library and provide current build result as parameter
-              //sendNotification currentBuild.result
+              sendNotification currentBuild.result
             }
 
-/*        success {
+        success {
             script {
-                *//* Use slackNotifier.groovy from shared library and provide current build result as parameter *//*
+                // Use slackNotifier.groovy from shared library and provide current build result as parameter
                 env.failedStage = "none"
                 env.emoji = ":white_check_mark: :tada: :thumbsup_all:"
-                sendNotification currentBuild.result
+                  currentBuild.result
             }
         }
 
@@ -244,7 +246,7 @@ pipeline {
                 env.emoji = ":x: :red_circle: :sos:"
                 sendNotification currentBuild.result
             }
-        }*/
+        }
     }
 }
 
