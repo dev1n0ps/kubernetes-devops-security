@@ -227,9 +227,9 @@ pipeline {
               //sendNotification currentBuild.result
             }
 
-        success {
+/*        success {
             script {
-                /* Use slackNotifier.groovy from shared library and provide current build result as parameter */
+                *//* Use slackNotifier.groovy from shared library and provide current build result as parameter *//*
                 env.failedStage = "none"
                 env.emoji = ":white_check_mark: :tada: :thumbsup_all:"
                 sendNotification currentBuild.result
@@ -244,7 +244,7 @@ pipeline {
                 env.emoji = ":x: :red_circle: :sos:"
                 sendNotification currentBuild.result
             }
-        }
+        }*/
     }
 }
 
