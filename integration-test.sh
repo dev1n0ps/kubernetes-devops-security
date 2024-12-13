@@ -12,7 +12,9 @@ echo $applicationURL:$PORT$applicationURI
 if [[ ! -z "$PORT" ]];
 then
 
-    response=$(curl -s $applicationURL:$PORT$applicationURI)
+    FULL_URL= curl --connect-timeout 10 -s $applicationURL:$PORT$applicationURI
+    echo "Constructed URL: $FULL_URL"
+    response=$(FULL_URL)
     http_code=$(curl -s -o /dev/null -w "%{http_code}" $applicationURL:$PORT$applicationURI)
 
     echo "response code : $response"
