@@ -245,49 +245,50 @@ pipeline {
             }
         }
 
-        //    stage('Integration Tests - PROD') {
-        //      steps {
-        //        script {
-        //          try {
-        //            withKubeConfig([credentialsId: 'kubeconfig']) {
-        //              sh "bash integration-test-PROD.sh"
-        //            }
-        //          } catch (e) {
-        //            withKubeConfig([credentialsId: 'kubeconfig']) {
-        //              sh "kubectl -n prod rollout undo deploy ${deploymentName}"
-        //            }
-        //            throw e
-        //          }
-        //        }
-        //      }
-    }
-
-    post {
-        always {
-            junit 'target/surefire-reports/*.xml'
-            jacoco execPattern: 'target/jacoco.exec'
-            dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
-            publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'owasp-zap-report', reportFiles: 'zap_report.html', reportName: 'OWASP ZAP HTML Report', reportTitles: 'OWASP ZAP HTML Report'])
-            //Use sendNotifications.groovy from shared library and provide current build result as parameter
-            sendNotification currentBuild.result
-        }
-
-        success {
-            script {
-                // Use slackNotifier.groovy from shared library and provide current build result as parameter
-                env.failedStage = "none"
-                env.emoji = ":white_check_mark: :tada: :thumbsup_all:"
-                currentBuild.result
+        stage('Integration Tests - PROD') {
+            steps {
+                script {
+                    try {
+                        withKubeConfig([credentialsId: 'kubeconfig']) {
+                            sh "bash integration-test-PROD.sh"
+                        }
+                    } catch (e) {
+                        withKubeConfig([credentialsId: 'kubeconfig']) {
+                            sh "kubectl -n prod rollout undo deploy ${deploymentName}"
+                        }
+                        throw e
+                    }
+                }
             }
         }
 
-        failure {
-            script {
-                //Fetch information about  failed stage
-                def failedStages = getFailedStages(currentBuild)
-                env.failedStage = failedStages.failedStageName
-                env.emoji = ":x: :red_circle: :sos:"
+        post {
+            always {
+                junit 'target/surefire-reports/*.xml'
+                jacoco execPattern: 'target/jacoco.exec'
+                dependencyCheckPublisher pattern: 'target/dependency-check-report.xml'
+                publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'owasp-zap-report', reportFiles: 'zap_report.html', reportName: 'OWASP ZAP HTML Report', reportTitles: 'OWASP ZAP HTML Report'])
+                //Use sendNotifications.groovy from shared library and provide current build result as parameter
                 sendNotification currentBuild.result
+            }
+
+            success {
+                script {
+                    // Use slackNotifier.groovy from shared library and provide current build result as parameter
+                    env.failedStage = "none"
+                    env.emoji = ":white_check_mark: :tada: :thumbsup_all:"
+                    currentBuild.result
+                }
+            }
+
+            failure {
+                script {
+                    //Fetch information about  failed stage
+                    def failedStages = getFailedStages(currentBuild)
+                    env.failedStage = failedStages.failedStageName
+                    env.emoji = ":x: :red_circle: :sos:"
+                    sendNotification currentBuild.result
+                }
             }
         }
     }
